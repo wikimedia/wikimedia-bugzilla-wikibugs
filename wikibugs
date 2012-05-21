@@ -141,8 +141,8 @@ $summary =~ s/\s+/ /g;
 # This stuff is going to contain $st. But we want a chance of changing it first.
 $output = "";
 
+my $product = $mail->header( 'X-Bugzilla-Product' );
 if ($st eq "\00303(NEW)\003") {
-  my $product   = $mail->header( 'X-Bugzilla-Product' );
   my $component = $mail->header( 'X-Bugzilla-Component' );
   my $severity  = $mail->header( 'X-Bugzilla-Severity' );
 
