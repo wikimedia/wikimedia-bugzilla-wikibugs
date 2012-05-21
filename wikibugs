@@ -33,6 +33,7 @@ Options:
   --help brief help message
 
   --dir  Directory to write logfiles to
+  Default: /var/lib/wikibugs/log
 
   --stdout Write every message to stdout instead of to files,
   messages will be prefixed with Bugzilla product name.
@@ -44,7 +45,7 @@ Options:
 
 # Array holding command line options
 my %opt = (
-	'dir'    => '/var/wikibugs',
+	'dir'    => '/var/lib/wikibugs/log',
 	'debug' => 0,
 );
 GetOptions( \%opt, 'debug', 'help', 'dir=s', 'stdout' ) or pod2usage(2);
