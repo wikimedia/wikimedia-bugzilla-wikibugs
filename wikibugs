@@ -23,25 +23,28 @@ wikibugs - A bugzilla IRC notification bot
 
 =head1 SYNOPSIS
 
-wikibugs [options]
+wikibugs [--dir|--stdout] [other options]
 
 Options:
 
   --help brief help message
 
-  --debug Write to STDERR some debugging messages
+  --dir  Directory to write logfiles to
 
-  --stdout Write every message to stdout instead of files
-           usefull for debugging purposes.
+  --stdout Write every message to stdout instead of to files,
+  messages will be prefixed with Bugzilla product name.
+  Takeover --dir.
+
+  --debug Write to STDERR some debugging messages
 
 =cut
 
 # Array holding command line options
 my %opt = (
-	'to' => '/var/wikibugs/wikibugs.log',
+	'dir'    => '/var/wikibugs',
 	'debug' => 0,
 );
-GetOptions( \%opt, 'debug', 'help', 'stdout' ) or pod2usage(2);
+GetOptions( \%opt, 'debug', 'help', 'dir=s', 'stdout' ) or pod2usage(2);
 pod2usage(1) if $opt{'help'};
 
 $/ = undef;
@@ -69,6 +72,21 @@ my $rhash = {
   'WONTFIX'    => "\00303(WONTFIX)\003",
   'LATER'      => "\00306(LATER)\003",
   'REMIND'     => "\00306(REMIND)\003"
+};
+
+# Map Products to a log file https://bugzilla.wikimedia.org/enter_bug.cgi
+# The special 'default' product is where message will be written to if no
+# product is found.
+# Whenever adding a new file here, you will have to update puppet configuration
+# so the wikibugs ircecho script read from them and send the message to the
+# appropriate channel.
+my $logFile = {
+	'Wikimedia Labs'   => $opt{'dir'} . '/wikimedia-labs.log',
+	'Wikimedia Mobile' => $opt{'dir'} . '/wikimedia-mobile.log',
+	'Wikipedia App'    => $opt{'dir'} . '/wikimedia-mobile.log',
+	'Wiktionary App'   => $opt{'dir'} . '/wikimedia-mobile.log',
+
+	'default' => $opt{'dir'} . '/mediawiki.log',
 };
 
 # Parse a received email
@@ -202,11 +220,19 @@ $output = "$st $summary - \00310$url\003 " . $output;
 
 if ($output) {
 	if( $opt{'stdout'} ) {
-		print $output;
+		print $product . "|" . $output;
 	} else {
-	  open (OUT, ">>/var/wikibugs/wikibugs.log");
-	  print OUT $output;
-	  close OUT;
+		if( exists $logFile->{$product} ) {
+			open (OUT, '>>' . $logFile->{$product} )
+			or print STDERR "Failed to open for writing '$logFile->{$product}'\n";
+		}
+		unless( fileno OUT ) {
+			open (OUT, '>>' . $logFile->{'default'} )
+			or print STDERR "Failed to open for writing '$logFile->{'default'}'\n";
+		}
+
+		print OUT $output;
+		close OUT;
 	}
 }
 
