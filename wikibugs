@@ -18,6 +18,9 @@ use utf8;
 use Getopt::Long;
 use Pod::Usage;
 
+# Override program name to easily monitor it from nagios
+$0 = "wikibugs @ARGV";
+
 =head1 NAME
 wikibugs - A bugzilla IRC notification bot
 
