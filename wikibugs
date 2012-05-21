@@ -12,8 +12,37 @@
 # http://wikitech.wikimedia.org/view/Wikibugs and finally migrated to
 # the subversion repository in 2007.
 
+use warnings;
 use strict;
 use utf8;
+use Getopt::Long;
+use Pod::Usage;
+
+=head1 NAME
+wikibugs - A bugzilla IRC notification bot
+
+=head1 SYNOPSIS
+
+wikibugs [options]
+
+Options:
+
+  --help brief help message
+
+  --debug Write to STDERR some debugging messages
+
+  --stdout Write every message to stdout instead of files
+           usefull for debugging purposes.
+
+=cut
+
+# Array holding command line options
+my %opt = (
+	'to' => '/var/wikibugs/wikibugs.log',
+	'debug' => 0,
+);
+GetOptions( \%opt, 'debug', 'help', 'stdout' ) or pod2usage(2);
+pod2usage(1) if $opt{'help'};
 
 $/ = undef;
 my $contents = <STDIN>;
@@ -172,8 +201,18 @@ if ($st eq "\00303(NEW)\003") {
 $output = "$st $summary - \00310$url\003 " . $output;
 
 if ($output) {
-  open (OUT, ">>/var/wikibugs/wikibugs.log");
-  #print $output;
-  print OUT $output;
-  close OUT;
+	if( $opt{'stdout'} ) {
+		print $output;
+	} else {
+	  open (OUT, ">>/var/wikibugs/wikibugs.log");
+	  print OUT $output;
+	  close OUT;
+	}
+}
+
+# Print a debugging message
+sub debug {
+	return unless $opt{'debug'};
+	my $message = shift;
+	print STDERR "Debug: $message\n";
 }
