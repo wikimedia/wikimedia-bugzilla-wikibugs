@@ -1,7 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-# Script to pull bug info from SourceForce and MediaZilla mails and dump them
-# to a log to be used for IRC bot.
+# Script to pull bug info from Bugzilla notification mails
+# and write it to a log. This is then used by an IRC bot to
+# further notify relevant IRC channels.
+#
 # See: http://wikitech.wikimedia.org/view/Wikibugs
 
 # Original version by Brion Vibber, 2004-08-02, 2004-08-10 and 2004-08-15
@@ -10,10 +12,12 @@
 #
 # The source code was originally edited on the Wikitech wiki at:
 # http://wikitech.wikimedia.org/view/Wikibugs and finally migrated to
-# the subversion repository in 2007.
+# the subversion repository in 2007. It has been available on Gerrit
+# in the wikimedia/bugzilla/wikibugs Git repository since 2012.
 
 use warnings;
 use strict;
+
 use utf8;
 use Getopt::Long;
 use Pod::Usage;
@@ -22,7 +26,7 @@ use Pod::Usage;
 $0 = "wikibugs @ARGV";
 
 =head1 NAME
-wikibugs - A bugzilla IRC notification bot
+wikibugs - A Bugzilla IRC notification bot
 
 =head1 SYNOPSIS
 
@@ -78,7 +82,7 @@ my $rhash = {
   'REMIND'     => "\00306(REMIND)\003"
 };
 
-# Map Products to a log file https://bugzilla.wikimedia.org/enter_bug.cgi
+# Map products to a log file https://bugzilla.wikimedia.org/enter_bug.cgi
 # The special 'default' product is where message will be written to if no
 # product is found.
 # Whenever adding a new file here, you will have to update puppet configuration
