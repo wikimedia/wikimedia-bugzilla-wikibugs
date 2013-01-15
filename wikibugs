@@ -173,8 +173,8 @@ if ($type eq 'new') {
   my $component = $mail->header( 'X-Bugzilla-Component' );
   my $severity  = $mail->header( 'X-Bugzilla-Severity' );
 
-  ## Doesn't seem to be sent as a header.
-  my $reporter = $1 if $body =~ /ReportedBy: (.*)\@.*$/m;
+  ## XXX Is X-Bugzilla-Who always the "reporter"?
+  my $reporter = $body =~ /Reporter: (.*)\@.*$/m && $1 || (split '@', $mail->header('X-Bugzilla-Who'))[0];
 
   $output .= "$severity; \002$product\002\: $component; (\002$reporter\002)\n";
 } else {
