@@ -93,6 +93,7 @@ my $logFile = {
 	'Wikimedia Mobile' => $opt{'dir'} . '/wikimedia-mobile.log',
 	'Wikipedia App'    => $opt{'dir'} . '/wikimedia-mobile.log',
 	'Wiktionary App'   => $opt{'dir'} . '/wikimedia-mobile.log',
+	'Parsoid'          => $opt{'dir'} . '/mediawiki-parsoid.log',
 
 	'default' => $opt{'dir'} . '/mediawiki.log',
 };
